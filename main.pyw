@@ -199,13 +199,125 @@ def HelpFunction():
     #os.system("notepad "+ProgramPath+"Help")
     HelpWin=Tkinter.Toplevel()
     HelpWin.title('Help')
-    fp=open(ProgramPath+"Help")
+    fp=open(ProgramPath+"Help\\Help")
     HelpMain=fp.readlines()
     fp.close()
     HelpText=Tkinter.Text(HelpWin)
     HelpText.pack()
     for x in HelpMain:
         HelpText.insert('end',x.decode('gb2312'))
+
+################### Download and open history ##########################
+
+def Download():
+    usrname=usr.get()
+    password=usr.get()
+    usr.put(usrname)
+    usr.put(password)
+    if usrname <> "db02906" or base64.encodestring(password) <> 'ZGJnaGRiNjUwODAw\n':
+        login()
+    else:
+        Dowloading()
+def Dowloading():
+    usrname=usr.get()
+    password=usr.get()
+    usr.put(usrname)
+    usr.put(password)
+    ssh2=paramiko.SSHClient()
+    ssh2.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    State.set("开始尝试连接到SSH服务器")
+    N=0
+    while N<10:
+        try:
+            N=N+1
+            State.set("Try to connect SSH serve %s" % N)
+            ssh2.connect("umacux4.wkg1.umac.mo",22,usrname,password,timeout=5)
+        except:
+            pass
+        else:
+            break
+    if N<10:
+        try:
+            State.set("开始接收数据")
+            IN,OUT,ADDR=ssh2.exec_command("cd ~/speaking;ls")
+        except:
+            State.set("连接错误，没能连接上网络，请重试。")
+            usrname=usr.get()
+            password=usr.get()
+            usr.put("None")
+            usr.put("None")
+        else:
+            State.set("连接成功")
+            DownloadWin=Tkinter.Toplevel()
+            DownloadWin.title('Download and open history')
+            DownloadLabel=Tkinter.Label(DownloadWin,text="选择你要下载的文件：",\
+                                        font="Times 15 bold")
+            DownloadLabel.grid(row=0,column=0)
+            global DownloadFile
+            DownloadFile=Tkinter.StringVar()
+            DownloadFile.set("")
+            FileChoose=ttk.Combobox(DownloadWin,text=DownloadFile,\
+                                    values=OUT.readlines(),\
+                                    font="Times 15 bold")
+            FileChoose.grid(row=0,column=1)
+            DownloadButton=Tkinter.Button(DownloadWin,text="开始下载",\
+                                        font="Times 15 bold",\
+                                          command=NowDownload)
+            DownloadButton.grid(row=0,column=2)
+    else:
+        State.set("连接错误，没能连接上网络，请重试。")
+        usrname=usr.get()
+        password=usr.get()
+        usr.put("None")
+        usr.put("None")
+
+def NowDownload():
+    usrname=usr.get()
+    password=usr.get()
+    usr.put(usrname)
+    usr.put(password)
+    ssh2=paramiko.Transport(("umacux4.wkg1.umac.mo",22))
+    N=0
+    while N<10:
+        try:
+            N=N+1
+            State.set("Try to connect SSH serve %s" % N)
+            ssh2.connect(username=usrname,password=password)
+            sftp=paramiko.SFTPClient.from_transport(ssh2)
+        except:
+            pass
+        else:
+            break
+    if N<10:
+        remotepath='/home/stud/db02906/speaking/'+DownloadFile.get()
+        localpath=ProgramPath+'history\\'+DownloadFile.get()
+        try:
+            State.set("开始接收数据")
+            sftp.get(remotepath,localpath)
+        except:
+            State.set("连接错误，没能连接上网络，请重试。")
+            usrname=usr.get()
+            password=usr.get()
+            usr.put("None")
+            usr.put("None")
+        else:
+            State.set("连接成功")
+            ssh2.close()
+            HistoryWin=Tkinter.Toplevel()
+            HistoryWin.title(DownloadFile.get())
+            fp=open(ProgramPath+'history\\'+DownloadFile.get())
+            HistoryMain=fp.readlines()
+            fp.close()
+            HistoryText=Tkinter.Text(HistoryWin)
+            HistoryText.pack()
+            for x in HistoryMain:
+                HistoryText.insert('end',x)
+    else:
+        State.set("连接错误，没能连接上网络，请重试。")
+        usrname=usr.get()
+        password=usr.get()
+        usr.put("None")
+        usr.put("None")
 
 ############### 主程序 #######################
 
@@ -224,7 +336,7 @@ root=Tkinter.Tk()
 Menubar=Tkinter.Menu(root)
 
 filemenu=Tkinter.Menu(Menubar,tearoff=0)
-filemenu.add_command(label="Download and Open History")
+filemenu.add_command(label="Download and Open History",command=Download)
 filemenu.add_command(label="Quit",command=QuitFunction)
 Menubar.add_cascade(label="File",menu=filemenu)
 
