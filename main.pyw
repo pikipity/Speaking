@@ -51,10 +51,16 @@ def getnamepass(event=None):
     usr.put(usrname)
     usr.put(password)
     if usrname == "db02906" and base64.encodestring(password) == 'ZGJnaGRiNjUwODAw\n':
-        loginwindow.destroy()
-        LoginThreading=threading.Thread(target=LoginThread)
-        LoginThreading.daemon=True
-        LoginThreading.start()
+        LoginSource=LoginFrom.get()
+        LoginFrom.put(LoginSource)
+        if LoginSource=='normal login':
+            loginwindow.destroy()
+            LoginThreading=threading.Thread(target=LoginThread)
+            LoginThreading.daemon=True
+            LoginThreading.start()
+        else:
+            loginwindow.destroy()
+            Dowloading()
     else:
         tkMessageBox.showwarning("输入错误","你不知道我的学生证号和密码么？")
         usrnameInput.focus()
@@ -144,6 +150,8 @@ def Sending(event=None):
     usr.put(usrname)
     usr.put(password)
     if usrname <> "db02906" or base64.encodestring(password) <> 'ZGJnaGRiNjUwODAw\n':
+        LoginFrom.get()
+        LoginFrom.put('normal login')
         login()
     else:
         SendingNowThreading=threading.Thread(target=NowSend)
@@ -215,6 +223,8 @@ def Download():
     usr.put(usrname)
     usr.put(password)
     if usrname <> "db02906" or base64.encodestring(password) <> 'ZGJnaGRiNjUwODAw\n':
+        LoginFrom.get()
+        LoginFrom.put('download login')
         login()
     else:
         Dowloading()
@@ -330,6 +340,9 @@ usr.put("None")
 
 ReadQueue=Queue.Queue()
 ReadQueue.put("None")
+
+LoginFrom=Queue.Queue()
+LoginFrom.put('Normal login')
         
 root=Tkinter.Tk()
 
