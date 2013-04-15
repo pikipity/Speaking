@@ -61,6 +61,9 @@ def getnamepass(event=None):
         else:
             loginwindow.destroy()
             Dowloading()
+            LoginThreading=threading.Thread(target=LoginThread)
+            LoginThreading.daemon=True
+            LoginThreading.start()
     else:
         tkMessageBox.showwarning("输入错误","你不知道我的学生证号和密码么？")
         usrnameInput.focus()
@@ -99,7 +102,10 @@ def LoginThread():
         else:
             break
     if (N<10):
-        NowSend()
+        LoginSource=LoginFrom.get()
+        LoginFrom.put(LoginSource)
+        if LoginSource=='normal lgoin':
+            NowSend()
         Rotor=1
         while Rotor:
             try:
