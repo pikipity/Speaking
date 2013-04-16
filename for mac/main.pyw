@@ -51,10 +51,19 @@ def getnamepass(event=None):
     usr.put(usrname)
     usr.put(password)
     if usrname == "db02906" and base64.encodestring(password) == 'ZGJnaGRiNjUwODAw\n':
-        loginwindow.destroy()
-        LoginThreading=threading.Thread(target=LoginThread)
-        LoginThreading.daemon=True
-        LoginThreading.start()
+        LoginSource=LoginFrom.get()
+        LoginFrom.put(LoginSource)
+        if LoginSource=='normal login':
+            loginwindow.destroy()
+            LoginThreading=threading.Thread(target=LoginThread)
+            LoginThreading.daemon=True
+            LoginThreading.start()
+        else:
+            loginwindow.destroy()
+            Dowloading()
+            LoginThreading=threading.Thread(target=LoginThread)
+            LoginThreading.daemon=True
+            LoginThreading.start()
     else:
         tkMessageBox.showwarning("输入错误","你不知道我的学生证号和密码么？")
         usrnameInput.focus()
@@ -93,7 +102,10 @@ def LoginThread():
         else:
             break
     if (N<10):
-        NowSend()
+        LoginSource=LoginFrom.get()
+        LoginFrom.put(LoginSource)
+        if LoginSource=='normal login':
+            NowSend()
         Rotor=1
         while Rotor:
             try:
@@ -144,6 +156,8 @@ def Sending(event=None):
     usr.put(usrname)
     usr.put(password)
     if usrname <> "db02906" or base64.encodestring(password) <> 'ZGJnaGRiNjUwODAw\n':
+        LoginFrom.get()
+        LoginFrom.put('normal login')
         login()
     else:
         SendingNowThreading=threading.Thread(target=NowSend)
@@ -196,6 +210,7 @@ def OpenBlog(event="None"):
     webbrowser.open("pikipity.github.io")
 
 def HelpFunction():
+    #os.system("notepad "+ProgramPath+"Help")
     HelpWin=Tkinter.Toplevel()
     HelpWin.title('Help')
     fp=open(ProgramPath+"Help/Help")
@@ -214,6 +229,8 @@ def Download():
     usr.put(usrname)
     usr.put(password)
     if usrname <> "db02906" or base64.encodestring(password) <> 'ZGJnaGRiNjUwODAw\n':
+        LoginFrom.get()
+        LoginFrom.put('download login')
         login()
     else:
         Dowloading()
@@ -320,7 +337,7 @@ def NowDownload():
 
 ############### 主程序 #######################
 
-ProgramPath=sys.argv[0][0:sys.argv[0].rfind('/')+1]
+ProgramPath=sys.argv[0][0:sys.argv[0].rfind('\\')+1]
 Name="Wang Ze"
 global usr
 usr=Queue.Queue()
@@ -329,6 +346,9 @@ usr.put("None")
 
 ReadQueue=Queue.Queue()
 ReadQueue.put("None")
+
+LoginFrom=Queue.Queue()
+LoginFrom.put('Normal login')
         
 root=Tkinter.Tk()
 
