@@ -166,11 +166,12 @@ def Sending(event=None):
 ############### Send 副程序 ##############################
 def NowSend():
     finput=open('input.txt','r')
-    if len(finput.readline())==0:
+    textmaintain=finput.readlines()
+    finput.close()
+    if len(textmaintain)==0:
         TextSend=""
     else:
-        TextSend=finput.readlines()[len(finput.readlines())-1]
-    finput.close()
+        TextSend=textmaintain[len(textmaintain)-1]
     title="\""+Name+" say "+time.strftime("%Y-%m-%d %A %H : %M : %S",time.localtime(time.time()))+"\""
     InputText=""""---> """+TextSend.replace("!","\!").replace('"','”')+"""\""""
     try:
