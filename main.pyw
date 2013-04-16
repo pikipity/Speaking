@@ -104,7 +104,7 @@ def LoginThread():
     if (N<10):
         LoginSource=LoginFrom.get()
         LoginFrom.put(LoginSource)
-        if LoginSource=='normal lgoin':
+        if LoginSource=='normal login':
             NowSend()
         Rotor=1
         while Rotor:
@@ -167,7 +167,7 @@ def Sending(event=None):
 def NowSend():
     TextSend=InText.get()
     title="\""+Name+" say "+time.strftime("%Y-%m-%d %A %H : %M : %S",time.localtime(time.time()))+"\""
-    InputText=""""---> """+TextSend.replace("!","\!").encode("utf-8")+"""\""""
+    InputText=""""---> """+TextSend.replace("!","\!").replace('"',u' “').encode('utf-8')+"""\""""
     try:
         State.set("开始发送数据")
         FileName=time.strftime("%Y-%m-%d",time.localtime(time.time()))
@@ -179,9 +179,11 @@ def NowSend():
         password=usr.get()
         usr.put("None")
         usr.put("None")
+        InText.focus()
     else:
         State.set("发送成功")
         InText.delete("0","end")
+        InText.focus()
 
 ############################################
 def QuitFunction():
@@ -338,7 +340,7 @@ def NowDownload():
 ############### 主程序 #######################
 
 ProgramPath=sys.argv[0][0:sys.argv[0].rfind('\\')+1]
-Name="Wang Ze"
+Name="Zhou Yingsi"
 global usr
 usr=Queue.Queue()
 usr.put("None")
