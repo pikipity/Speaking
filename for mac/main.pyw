@@ -165,9 +165,14 @@ def Sending(event=None):
 
 ############### Send 副程序 ##############################
 def NowSend():
-    TextSend=InText.get()
+    finput=open('input.txt','r')
+    if len(finput.readline())==0:
+        TextSend=""
+    else:
+        TextSend=finput.readlines()[len(finput.readlines())-1]
+    finput.close()
     title="\""+Name+" say "+time.strftime("%Y-%m-%d %A %H : %M : %S",time.localtime(time.time()))+"\""
-    InputText=""""---> """+TextSend.replace("!","\!").encode("utf-8")+"""\""""
+    InputText=""""---> """+TextSend.replace("!","\!").replace('"','”')+"""\""""
     try:
         State.set("开始发送数据")
         FileName=time.strftime("%Y-%m-%d",time.localtime(time.time()))
@@ -179,9 +184,11 @@ def NowSend():
         password=usr.get()
         usr.put("None")
         usr.put("None")
+        InText.focus()
     else:
         State.set("发送成功")
         InText.delete("0","end")
+        InText.focus()
 
 ############################################
 def QuitFunction():
@@ -337,7 +344,9 @@ def NowDownload():
 
 ############### 主程序 #######################
 
-ProgramPath=sys.argv[0][0:sys.argv[0].rfind('\\')+1]
+os.system('open input.txt')
+
+ProgramPath=sys.argv[0][0:sys.argv[0].rfind('/')+1]
 Name="Wang Ze"
 global usr
 usr=Queue.Queue()
